@@ -21,14 +21,32 @@ facet_data <- function (){
     ggtitle("Electricity Generation vs Energy Type, Faceted by Continent")
 }
 
+scatter_data <- function (){
+  energy_long %>%
+    ggplot() +
+    geom_line(aes(year, renewables_consumption, 
+                  col = continent, group = country),
+              size = 0.7, alpha = 0.7) +
+    scale_y_log10() +
+    scale_x_continuous(expand = c(0, 0)) +
+    xlab("Year") +
+    ylab("Ren. Energy Consumption (terawatt-hours, log10 scale)") +
+    ggtitle("Renewable Energy Consumption by Year")
+}
+
 ui <- fluidPage(
   h1("Shiny Energy Data Visualization"),
-  plotOutput("plot")
+  plotOutput("plot"),
+  h3(""), #new line between graphs
+  plotOutput("scatter")
 )
 
 server <- function(input, output){
   output$plot <- renderPlot({
     facet_data()
+  })
+  output$scatter <- renderPlot({
+    scatter_data()
   })
 }
 
