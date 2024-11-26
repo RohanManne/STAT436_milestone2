@@ -38,13 +38,18 @@ facet_data <- function() {
     ggtitle("Electricity Generation vs Energy Type, Faceted by Continent")
 }
 
-scatter_data <- function() {
-  ggplot(energy_long) +
-    geom_line(aes(year, renewables_consumption, color = continent, group = country), size = 0.7, alpha = 0.7) +
-    scale_y_log10() +
+ribbon_data <- function() {
+  energy_long %>% group_by(continent, year) %>% 
+    summarize(rc = sum(renewables_consumption)) %>%
+  
+    ggplot() +
+    geom_ribbon(aes(x = year, ymin = 0, 
+                    ymax = rc, color = continent, fill = continent),
+                size = 0.7, alpha = 0.6) +
+    #scale_y_log10() +
     scale_x_continuous(expand = c(0, 0)) +
     xlab("Year") +
-    ylab("Renewable Energy Consumption (terawatt-hours, log10 scale)") +
+    ylab("Renewable Energy Consumption (terawatt-hours)") +
     ggtitle("Renewable Energy Consumption by Year")
 }
 
@@ -57,7 +62,7 @@ ui <- fluidPage(
     mainPanel(
       plotlyOutput("choropleth_map"),
       plotOutput("plot"),
-      plotOutput("scatter")
+      plotOutput("ribbon")
     )
   )
 )
@@ -102,8 +107,8 @@ server <- function(input, output, session) {
     facet_data()
   })
   
-  output$scatter <- renderPlot({
-    scatter_data()
+  output$ribbon <- renderPlot({
+    ribbon_data()
   })
 }
 
