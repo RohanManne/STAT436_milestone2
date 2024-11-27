@@ -40,12 +40,13 @@ facet_data <- function() {
 
 ribbon_data <- function() {
   energy_long %>% group_by(continent, year) %>% 
-    summarize(rc = sum(renewables_consumption)) %>%
-  
+    summarize(rc = sum(renewables_consumption, 
+                       na.rm = TRUE), .groups = "drop") %>%
+
     ggplot() +
     geom_ribbon(aes(x = year, ymin = 0, 
                     ymax = rc, color = continent, fill = continent),
-                size = 0.7, alpha = 0.6) +
+                linewidth = 0.7, alpha = 0.3) +
     #scale_y_log10() +
     scale_x_continuous(expand = c(0, 0)) +
     xlab("Year") +
