@@ -56,16 +56,18 @@ ribbon_data <- function() {
 
 ui <- fluidPage(
   titlePanel("Renewable Energy Analysis by Country"),
-  sidebarLayout(
-    sidebarPanel(
-      selectInput("year", "Select Year:", choices = sort(unique(renewable_share$Year)), selected = 1965)
-    ),
-    mainPanel(
-      plotlyOutput("choropleth_map"),
-      plotOutput("plot"),
-      plotOutput("ribbon")
-    )
-  )
+  sliderInput("year", "Select Year:", 
+              min = min(renewable_share$Year), 
+              max = max(renewable_share$Year), 
+              value = min(renewable_share$Year), 
+              step = 1, 
+              animate = animationOptions(interval = 1000, loop = TRUE),
+              sep = "",
+              width = "100%"),
+  br(),
+  plotlyOutput("choropleth_map"),
+  plotOutput("plot"),
+  plotOutput("ribbon")
 )
 
 server <- function(input, output, session) {
@@ -80,7 +82,7 @@ server <- function(input, output, session) {
       left_join(selected_data, by = "Code") %>%
       mutate(Display_Value = ifelse(is.na(Renewable_Percentage), -1, Renewable_Percentage))
     
-    # Custom color scale where -1 (NA) is gray
+    # custom color scale where -1 (NA) is gray
     custom_colorscale <- list(
       list(0, "gray"),
       list(0.0001, "lightblue"),
