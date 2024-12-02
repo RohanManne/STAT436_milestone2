@@ -70,16 +70,17 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  # choropleth map using Plotly
   output$choropleth_map <- renderPlotly({
-    selected_data <- renewable_share %>% filter(Year == input$year)
+    selected_data <- renewable_share %>%
+      filter(Year == input$year, Code != "ATA")
     
     all_countries <- unique(countrycode::codelist$iso3c)
     full_data <- tibble(Code = all_countries) %>%
+      filter(Code != "ATA") %>%
       left_join(selected_data, by = "Code") %>%
       mutate(Display_Value = ifelse(is.na(Renewable_Percentage), -1, Renewable_Percentage))
     
-    # custom color scale where -1 (NA) is gray
+    # Custom color scale where -1 (NA) is gray
     custom_colorscale <- list(
       list(0, "gray"),
       list(0.0001, "lightblue"),
