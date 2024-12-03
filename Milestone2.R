@@ -85,8 +85,8 @@ server <- function(input, output, session) {
     # custom color scale where -1 (NA) is gray
     custom_colorscale <- list(
       list(0, "gray"),
-      list(0.0001, "lightblue"),
-      list(1, "darkblue")
+      list(0.0001, "lightgreen"),
+      list(1, "darkgreen")
     )
     
     max_percent <- max(full_data$Renewable_Percentage, na.rm = TRUE)
