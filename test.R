@@ -13,24 +13,10 @@ renewable_share <- renewable_share %>%
   mutate(continent = countrycode(Country, origin = "country.name", destination = "continent"))
 
 energy_long <- energy %>%
-  rename(
-    "biofuel" = "biofuel_electricity",
-    "coal" = "coal_electricity",
-    "fossil" = "fossil_electricity",
-    "gas" = "gas_electricity",
-    "hydro" = "hydro_electricity",
-    "low_carbon" = "low_carbon_electricity",
-    "nuclear" = "nuclear_electricity",
-    "oil" = "oil_electricity",
-    "other_renewable" = "other_renewable_electricity",
-    "renewables" = "renewables_electricity",
-    "solar" = "solar_electricity",
-    "wind" = "wind_electricity"
-  ) %>%
   pivot_longer(
-    c("biofuel", "coal", "fossil", "gas", 
-      "hydro", "low_carbon", "nuclear", "oil", 
-      "other_renewable", "renewables", "solar", "wind"),
+    c("biofuel_electricity", "coal_electricity", "fossil_electricity", "gas_electricity", 
+      "hydro_electricity", "low_carbon_electricity", "nuclear_electricity", "oil_electricity", 
+      "other_renewable_electricity", "renewables_electricity", "solar_electricity", "wind_electricity"),
     names_to = "energy_type",
     values_to = "energy_values"
   ) %>%
@@ -40,11 +26,11 @@ energy_long <- energy %>%
   ) %>%
   filter(continent != "NA" & continent != "Antarctica" & energy_values != 0)
 
-facet_data <- function(maxYear) {
+facet_data <- function() {
   energy_long |>
-    filter(year <= maxYear ) |>
-    ggplot() + 
-    geom_boxplot(aes(energy_values, energy_type), color="darkgreen") + 
+  
+  ggplot() + 
+    geom_boxplot(aes(energy_values, energy_type, color = continent)) + 
     scale_x_log10() +
     facet_wrap(. ~ continent) +
     theme_bw() + 
@@ -54,13 +40,11 @@ facet_data <- function(maxYear) {
     ggtitle("Electricity Generation vs Energy Type, Faceted by Continent")
 }
 
-ribbon_data <- function(maxYear) {
-  energy_long |>
-    filter(year <= maxYear ) |>
-    group_by(continent, year) %>% 
+ribbon_data <- function() {
+  energy_long %>% group_by(continent, year) %>% 
     summarize(rc = sum(renewables_consumption, 
                        na.rm = TRUE), .groups = "drop") %>%
-
+    
     ggplot() +
     geom_ribbon(aes(x = year, ymin = 0, 
                     ymax = rc, color = continent, fill = continent),
@@ -73,13 +57,7 @@ ribbon_data <- function(maxYear) {
 }
 
 ui <- fluidPage(
-  # got from Stack Overflow: https://stackoverflow.com/questions/36906265/how-to-color-sliderbar-sliderinput
-  tags$head(tags$style(HTML('.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {background: #228b22;}
-                           .irs-from, .irs-to, .irs-single { background: #228b22 ! important}'
-  ))),
-  tags$style(HTML(".js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-bar {background: #228b22}")),
-  titlePanel(div("Renewable Energy Analysis by Country",
-                 style = "color: #000000; font-weight: bold; text-align: center;")),
+  titlePanel("Renewable Energy Analysis by Country"),
   sliderInput("year", "Select Year:", 
               min = min(renewable_share$Year), 
               max = max(renewable_share$Year), 
@@ -132,11 +110,11 @@ server <- function(input, output, session) {
   })
   
   output$plot <- renderPlot({
-    facet_data(input$year)
+    facet_data()
   })
   
   output$ribbon <- renderPlot({
-    ribbon_data(input$year)
+    ribbon_data()
   })
 }
 
