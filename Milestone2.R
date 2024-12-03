@@ -55,7 +55,13 @@ ribbon_data <- function() {
 }
 
 ui <- fluidPage(
-  titlePanel("Renewable Energy Analysis by Country"),
+  # got from Stack Overflow: https://stackoverflow.com/questions/36906265/how-to-color-sliderbar-sliderinput
+  tags$head(tags$style(HTML('.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {background: #228b22;}
+                           .irs-from, .irs-to, .irs-single { background: #228b22 ! important}'
+  ))),
+  tags$style(HTML(".js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-bar {background: #228b22}")),
+  titlePanel(div("Renewable Energy Analysis by Country",
+                 style = "color: #000000; font-weight: bold; text-align: center;")),
   sliderInput("year", "Select Year:", 
               min = min(renewable_share$Year), 
               max = max(renewable_share$Year), 
